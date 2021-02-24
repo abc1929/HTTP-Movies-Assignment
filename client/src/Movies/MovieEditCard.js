@@ -149,6 +149,7 @@ const MovieEditCard = (props) => {
             onClick={() => {
                if (partialurl.match(/add-movie/i) !== null) {
                   addMovie();
+                  history.goBack();
                } else {
                   updateMovie();
                }
