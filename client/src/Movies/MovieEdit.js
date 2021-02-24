@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import MovieCard from "./MovieCard";
-import { NavLink } from "react-router-dom";
+import MovieEditCard from "./MovieEditCard";
 
-function Movie({ addToSavedList }) {
+function MovieEdit({ addToSavedList, setCounter, counter }) {
    const [movie, setMovie] = useState(null);
    const params = useParams();
 
@@ -29,15 +28,13 @@ function Movie({ addToSavedList }) {
 
    return (
       <div className="save-wrapper">
-         <NavLink to={"/update-movie/" + movie.id}>
-            <MovieCard movie={movie} />
-         </NavLink>
-
-         <div className="save-button" onClick={saveMovie}>
-            Save
-         </div>
+         <MovieEditCard
+            movie={movie}
+            setCounter={setCounter}
+            counter={counter}
+         />
       </div>
    );
 }
 
-export default Movie;
+export default MovieEdit;

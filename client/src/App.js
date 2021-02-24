@@ -3,40 +3,46 @@ import { Route } from "react-router-dom";
 import SavedList from "./Movies/SavedList";
 import MovieList from "./Movies/MovieList";
 import Movie from "./Movies/Movie";
-import axios from 'axios';
+import MovieEdit from "./Movies/MovieEdit";
+import axios from "axios";
 
 const App = () => {
-  const [savedList, setSavedList] = useState([]);
-  const [movieList, setMovieList] = useState([]);
+   const [savedList, setSavedList] = useState([]);
+   const [movieList, setMovieList] = useState([]);
+   const [counter, setCounter] = useState(0);
 
-  const getMovieList = () => {
-    axios
-      .get("http://localhost:5000/api/movies")
-      .then(res => setMovieList(res.data))
-      .catch(err => console.log(err.response));
-  };
+   const getMovieList = () => {
+      axios
+         .get("http://localhost:5000/api/movies")
+         .then((res) => setMovieList(res.data))
+         .catch((err) => console.log(err.response));
+   };
 
-  const addToSavedList = movie => {
-    setSavedList([...savedList, movie]);
-  };
+   const addToSavedList = (movie) => {
+      setSavedList([...savedList, movie]);
+   };
 
-  useEffect(() => {
-    getMovieList();
-  }, []);
+   useEffect(() => {
+      getMovieList();
+   }, [counter]);
 
-  return (
-    <>
-      <SavedList list={savedList} />
+   return (
+      <>
+         <SavedList list={savedList} />
 
-      <Route exact path="/">
-        <MovieList movies={movieList} />
-      </Route>
+         <Route exact path="/">
+            <MovieList movies={movieList} />
+         </Route>
 
-      <Route path="/movies/:id">
-        <Movie addToSavedList={addToSavedList} />
-      </Route>
-    </>
-  );
+         <Route path="/movies/:id">
+            <Movie addToSavedList={addToSavedList} />
+         </Route>
+
+         <Route path="/update-movie/:id">
+            <MovieEdit setCounter={setCounter} counter={counter} />
+         </Route>
+      </>
+   );
 };
 
 export default App;
