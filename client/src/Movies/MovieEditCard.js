@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory, useParams, useLocation } from "react-router-dom";
 
 const MovieEditCard = (props) => {
    const { title, director, metascore, stars } = props.movie;
    const { id } = useParams();
    const history = useHistory();
+   const partialurl = useLocation().pathname;
 
    const [newMovieData, setNewMovieData] = useState({
       id: id,
@@ -17,8 +18,10 @@ const MovieEditCard = (props) => {
 
    const [bridge, setBridge] = useState(stars);
    useEffect(() => {
-      setBridge(newMovieData.stars);
-   }, [newMovieData.stars.length]);
+      if (newMovieData.stars.length !== bridge.length) {
+         setBridge(newMovieData.stars);
+      }
+   }, [newMovieData.stars, bridge.length]);
 
    const updateMovie = () => {
       axios
@@ -32,12 +35,30 @@ const MovieEditCard = (props) => {
          });
    };
 
+   const addMovie = () => {
+      axios
+         .post("http://localhost:5000/api/movies/", {
+            ...newMovieData,
+            stars: newMovieData.stars.filter((i) => i !== ""),
+         })
+         .then((res) => {
+            props.setCounter(props.counter + 1);
+            history.goBack();
+         });
+   };
+
    return (
-      <div>
-         <div className="movie-card">
+      <div
+         style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+         }}
+      >
+         <div className="movie-card" style={{ width: "80vw" }}>
             {/* {console.log(stars)} */}
             <h3>
-               Movie Name:
+               Movie Name:{" "}
                <input
                   defaultValue={newMovieData.title}
                   // value={newMovieData.title}
@@ -51,7 +72,7 @@ const MovieEditCard = (props) => {
             </h3>
 
             <div className="movie-director">
-               Director:
+               Director:{" "}
                <input
                   defaultValue={newMovieData.director}
                   // value={newMovieData.director}
@@ -64,7 +85,7 @@ const MovieEditCard = (props) => {
                />
             </div>
             <div className="movie-metascore">
-               Metascore:
+               Metascore:{" "}
                <input
                   defaultValue={newMovieData.metascore}
                   // value={newMovieData.metascore}
@@ -77,7 +98,7 @@ const MovieEditCard = (props) => {
                />
             </div>
             <h3>
-               Actors
+               Actors{" "}
                <button
                   onClick={() =>
                      setNewMovieData({
@@ -89,6 +110,7 @@ const MovieEditCard = (props) => {
                   Add
                </button>
             </h3>
+            {/* can't allow onChange to trigger rerender, so we only rerender on stars array's length change */}
             {bridge.map((star, i) => (
                <div key={star + i} className="movie-star">
                   <div>
@@ -123,11 +145,25 @@ const MovieEditCard = (props) => {
          </div>
          <div
             className="save-button"
+            style={{ width: "20vw", cursor: "pointer" }}
             onClick={() => {
-               updateMovie();
+               if (partialurl.match(/add-movie/i) !== null) {
+                  addMovie();
+               } else {
+                  updateMovie();
+               }
             }}
          >
             OK
+         </div>
+         <div
+            className="save-button red-button"
+            style={{ width: "20vw", marginTop: "1vh", cursor: "pointer" }}
+            onClick={() => {
+               history.goBack();
+            }}
+         >
+            Cancel
          </div>
       </div>
    );
